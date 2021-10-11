@@ -11,6 +11,7 @@ import discord
 import asyncio
 from replit import db
 from discord.ext import commands
+from keep_alive import keep_alive
 
 token = os.environ['token']
 prefix = 'plp '
@@ -57,7 +58,7 @@ async def character(ctx, user: discord.Member = None):
     user = user or ctx.author
     if user != None and str(user.id) in db.keys():
       char = db[str(user.id)]
-      await ctx.send("{} plays:\n> {}, Level {} {} {}".format(user.id, char[0].title(), char[3], char[1].capitalize(), char[2].capitalize()))
+      await ctx.send("{} plays:\n> {}, Level {} {} {}".format(user, char[0].title(), char[3], char[1].capitalize(), char[2].capitalize()))
     else:
       await ctx.send("No character found!")
 
@@ -75,7 +76,7 @@ async def delchar(ctx):
 
 
 @client.command()
-async def rename(ctx, char_name):
+async def changename(ctx, char_name):
   if str(ctx.author.id) in db.keys():
     old_name = db[str(ctx.author.id)][0]
     db[str(ctx.author.id)][0] = char_name
@@ -226,4 +227,5 @@ async def cleardb(ctx):
 async def info(ctx):
   await ctx.send("GTD&D Polyptech Bot. Contact <@126885302185885697> for any feedback/concerns!\nFor list of commands, use {}help".format(prefix))
 
+keep_alive()
 client.run(token)

@@ -157,6 +157,19 @@ async def dm(ctx):
   else:
     await ctx.send("Member does not meet the requirements (must have Member and DM roles).")
 
+@client.command(description = "Gives Veils of Sakar bot testing role")
+@commands.has_role("Member")
+async def test(ctx):
+  user = ctx.author
+  test = discord.utils.find(lambda r: r.name == 'testing', ctx.message.guild.roles)
+
+  if (test in user.roles):
+    await user.remove_roles(test)
+    await ctx.send("Removed bot testing role.")
+  else:
+    await user.add_roles(test)
+    await ctx.send("Added bot testing role. Thank you for your cooperation!")
+
 #test this
 @client.command(description = "Logs a quest and pushes it to the questlog")
 async def log(ctx, questname, sessions, *users: discord.Member):
@@ -231,6 +244,57 @@ async def cleardb(ctx):
 @client.command()
 async def info(ctx):
   await ctx.send("GTD&D Polyptech Bot. Contact <@126885302185885697> for any feedback/concerns!\nFor list of commands, use {}help".format(prefix))
+
+#/////////GETTERS////////
+@client.command(description = "Get name of mentioned user's character (self if no input)")
+@commands.has_role("testing")
+async def getname(ctx, user: discord.Member = None):
+    user = user or ctx.author
+    if user != None and str(user.id) in db.keys():
+      char = db[str(user.id)]
+      await ctx.send(char[0])
+    else:
+      await ctx.send("No character found!")
+
+@client.command(description = "Get race of mentioned user's character (self if no input)")
+@commands.has_role("testing")
+async def getrace(ctx, user: discord.Member = None):
+    user = user or ctx.author
+    if user != None and str(user.id) in db.keys():
+      char = db[str(user.id)]
+      await ctx.send(char[1])
+    else:
+      await ctx.send("No character found!")
+
+@client.command(description = "Get class of mentioned user's character (self if no input)")
+@commands.has_role("testing")
+async def getclass(ctx, user: discord.Member = None):
+    user = user or ctx.author
+    if user != None and str(user.id) in db.keys():
+      char = db[str(user.id)]
+      await ctx.send(char[2])
+    else:
+      await ctx.send("No character found!")
+
+@client.command(description = "Get level of mentioned user's character (self if no input)")
+@commands.has_role("testing")
+async def getlevel(ctx, user: discord.Member = None):
+    user = user or ctx.author
+    if user != None and str(user.id) in db.keys():
+      char = db[str(user.id)]
+      await ctx.send(char[3])
+    else:
+      await ctx.send("No character found!")
+
+@client.command(description = "Get sessions played of mentioned user's character (self if no input)")
+@commands.has_role("testing")
+async def getsessions(ctx, user: discord.Member = None):
+    user = user or ctx.author
+    if user != None and str(user.id) in db.keys():
+      char = db[str(user.id)]
+      await ctx.send(char[4])
+    else:
+      await ctx.send("No character found!")
 
 keep_alive()
 client.run(token)

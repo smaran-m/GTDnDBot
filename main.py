@@ -33,7 +33,8 @@ async def confirm_helper(ctx):
 async def on_ready():
   print("Logged in as {0.user}".format(client)) 
 
-@client.command()
+@client.command(description = "Creates new character for Veils of Sakar")
+@commands.has_role("Member")
 async def newchar(ctx, char_name, char_race, char_class):
   user = ctx.author
   if str(user.id) in db.keys():
@@ -53,7 +54,7 @@ async def newchar(ctx, char_name, char_race, char_class):
     else:
       await ctx.send("Character creation unsuccessful.")
 
-@client.command()
+@client.command(description = "Returns character of mentioned user (self if no input)")
 async def character(ctx, user: discord.Member = None):
     user = user or ctx.author
     if user != None and str(user.id) in db.keys():
@@ -62,7 +63,8 @@ async def character(ctx, user: discord.Member = None):
     else:
       await ctx.send("No character found!")
 
-@client.command()
+@client.command(description = "Deletes own character, this cannot be undone")
+@commands.has_role("Member")
 async def delchar(ctx):
   user = ctx.author
   if str(user.id) in db.keys():
@@ -75,7 +77,8 @@ async def delchar(ctx):
     await ctx.send("No character found!")
 
 
-@client.command()
+@client.command(description = "Changes name of character (self if no input)")
+@commands.has_role("Member")
 async def changename(ctx, char_name):
   if str(ctx.author.id) in db.keys():
     old_name = db[str(ctx.author.id)][0]
@@ -84,7 +87,7 @@ async def changename(ctx, char_name):
   else:
     await ctx.send("You do not have any characters.")
 
-@client.command()
+@client.command(description = "Changes race of character (self if no input), ADMIN ONLY")
 @commands.has_permissions(administrator = True)
 async def changerace(ctx, char_race, user: discord.Member = None):
   user = user or ctx.author
@@ -98,7 +101,7 @@ async def changerace(ctx, char_race, user: discord.Member = None):
   else:
     await ctx.send("No character found!")
 
-@client.command()
+@client.command(description = "Changes class of character (self if no input), ADMIN ONLY")
 @commands.has_permissions(administrator = True)
 async def changeclass(ctx, char_class, user: discord.Member = None):
   user = user or ctx.author
@@ -112,7 +115,7 @@ async def changeclass(ctx, char_class, user: discord.Member = None):
   else:
     await ctx.send("No character found!")
 
-@client.command()
+@client.command(description = "Changes level of character (self if no input), ADMIN ONLY")
 @commands.has_permissions(administrator = True)
 async def changelevel(ctx, char_level : int, user: discord.Member = None):
   user = user or ctx.author
@@ -129,16 +132,16 @@ async def changelevel(ctx, char_level : int, user: discord.Member = None):
         char[4] = 1
       elif char[3] == 3:
         char[4] = 3
-      elif char[3] == 4:
+      elif char[3] == 4: 
         char[4] = 6
       else:
-        char[4] = 10 + (char[3] - 4)*4
+        char[4] = 10 + (char[3] - 4)*4 #this might not be right, check the values
 
       await ctx.send("Changed character level.\n>>> Previous: {}\nNew: {}".format(old_level, char_level))
   else:
     await ctx.send("No character found!")
 
-@client.command()
+@client.command(description = "Gives Veils of Sakar DM role")
 async def dm(ctx):
   user = ctx.author
   member = discord.utils.find(lambda r: r.name == 'Member', ctx.message.guild.roles)
@@ -155,7 +158,7 @@ async def dm(ctx):
     await ctx.send("Member does not meet the requirements (must have Member and DM roles).")
 
 #test this
-@client.command()
+@client.command(description = "Logs a quest and pushes it to the questlog")
 async def log(ctx, questname, sessions, *users: discord.Member):
   await ctx.send("Log quest?\n> *{}*, lasted {} session(s).\nTo confirm, react with 👍".format(questname, sessions)) #THIS DOES NOT WORK, AUTHOR IS STR OBJECT
   if await confirm_helper(ctx):
@@ -190,17 +193,19 @@ async def log(ctx, questname, sessions, *users: discord.Member):
       await ctx.send("Game logging unsuccessful.")
 
 # WORK IN PROGRESS COMMANDS
-@client.command()
+@client.command(description = "WIP: Reveals new location in Sakar")
+@commands.has_role("Member")
 async def newloc(ctx):
   pass
 
-@client.command()
+@client.command(description = "Outputs list of characters, ordered by level")
+@commands.has_role("Member")
 async def leaderboard(ctx):
   charlist = []
   message = '**Leaderboard:\n**'
   for key in db.keys():
     charlist.append(db[key])
-  charlist.sort(key = lambda x: x[3], reverse = True)
+  charlist.sort(key = lambda x: x[3], reverse = True) #maybe change this to order by sessions played instead of level
   #print(charlist)
   rank = 1
   for char in charlist:
@@ -208,7 +213,7 @@ async def leaderboard(ctx):
     rank += 1
   await ctx.send(message)
 
-@client.command()
+@client.command(description = "Clears character database, this cannot be undone")
 @commands.has_permissions(administrator = True)
 async def cleardb(ctx):
   await ctx.send("Clear database? **This action cannot be undone.**")
